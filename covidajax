@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Covid Cases</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+</head>
+<style>
+    #search-form {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    #search-form input {
+        margin-left: 10px;
+    }
+</style>
+<body>
+    <div class="container">
+        <form id="search-form">
+            <input type="text" id="search-input" placeholder="Enter the country name" name="search-input">
+            <button type="submit" id="btn" class="btn btn-primary">Search</button>
+        </form>
+        <div class="row" id="covid19">
+            <script>
+                document.addEventListener("DOMContentLoaded",()=>{
+                    let covid = document.getElementById("covid19")
+                    fetch('https://api.covid19api.com/summary')
+                    .then(response => response.json())
+                    .then(data =>{
+                        console.log(data)
+                        let countries = data.Countries;
+                        let html = "";
+                        for (let i = 0; i < countries.length; i++) {
+                            let country = countries[i];
+                            html += `
+                            <div class="col-md-6 my-4">
+                                <div class="card p-3 m-2">
+                                    <form>
+                                        <div class="mb-3">
+                                        <label for="title" class="form-label">Title</label>
+                                        <input type="text" value="${country?.Country}" class="form-control">
+                                        <label for="title" class="form-label">Total Confirmed</label>
+                                        <input type="text" value="${country?.TotalConfirmed}" class="form-control">
+                                        <label for="title" class="form-label">TotalDeaths</label>
+                                        <input type="text" value="${country?.TotalDeaths}" class="form-control">
+                                        <label for="title" class="form-label">NewConfirmed</label>
+                                        <input type="text" value="${country?.NewConfirmed}" class="form-control">
+                                        <label for="title" class="form-label">NewDeaths</label>
+                                        <input type="text" value="${country?.NewDeaths}" class="form-control">
+                                        <label for="title" class="form-label">Date</label>
+                                        <input type="text" value="${new Date(country?.Date).toLocaleDateString('en-US')}" class="form-control">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            `
+                    }
+                    covid.innerHTML = html;
+                    })
+                    .catch(error =>{
+                        console.log(error)
+                    })
+            })
+            const searchForm = document.getElementById('search-form');
+            const resultContainer = document.getElementById('covid19');
+            searchForm.addEventListener('submit', searchCovidData);
+
+            function searchCovidData(event) {
+                event.preventDefault();
+                const searchInput = document.getElementById('search-input').value;
+                fetch(`https://api.covid19api.com/summary`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const countryData = data.Countries.find(country => country.Country.toLowerCase() === searchInput.toLowerCase());
+                        if (countryData) {
+                            resultContainer.innerHTML = `
+                            <div class="col-md-6 my-4">
+                                <div class="card p-3 m-2">
+                                    <form>
+                                        <label for="title" class="form-label">Title</label>
+                                        <input type="text" value="${countryData?.Country}" class="form-control">
+                                        <label for="title" class="form-label">Total Confirmed</label>
+                                        <input type="text" value="${countryData?.TotalConfirmed}" class="form-control">
+                                        <label for="title" class="form-label">TotalDeaths</label>
+                                        <input type="text" value="${countryData?.TotalDeaths}" class="form-control">
+                                        <label for="title" class="form-label">NewConfirmed</label>
+                                        <input type="text" value="${countryData?.NewConfirmed}" class="form-control">
+                                        <label for="title" class="form-label">NewDeaths</label>
+                                        <input type="text" value="${countryData?.NewDeaths}" class="form-control">
+                                        <label for="title" class="form-label">Date</label>
+                                        <input type="text" value="${new Date(countryData?.Date).toLocaleDateString('en-US')}" class="form-control">
+                                    </form>
+                                </div>
+                            </div>
+                            `
+                        } else {
+                            pass
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        resultContainer.innerHTML = `<p>Error loading data.</p>`;
+                    });
+            }
+        </script>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>    
+</body>
+</body>
+</html> 
